@@ -1,0 +1,11 @@
+{
+  "name": "architecture-review",
+  "displayName": "Architecture Review",
+  "version": "1.0.0",
+  "description": "Read-only architectural review agent — dependency rule, layer boundaries, coupling/cohesion, cycles, domain richness — framework-agnostic, infers the module map at runtime instead of assuming a fixed stack.",
+  "author": { "name": "Roman Minenok", "email": "roman.minenok@gmail.com" },
+  "keywords": ["architecture", "code-review", "read-only"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" }
+  ]
+}

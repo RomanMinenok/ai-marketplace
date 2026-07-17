@@ -6,5 +6,100 @@
     "name": "Roman Minenok",
     "email": "roman.minenok@gmail.com"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "research-tools",
+      "source": "./plugins/research-tools",
+      "description": "Read-only research agent that finds facts in a codebase or on the web and returns a strictly structured, honest report.",
+      "category": "engineering"
+    },
+    {
+      "name": "architecture-review",
+      "source": "./plugins/architecture-review",
+      "description": "Read-only architectural review agent — dependency rule, layer boundaries, coupling/cohesion, cycles, domain richness — framework-agnostic, infers the module map at runtime.",
+      "category": "engineering"
+    },
+    {
+      "name": "engineering-paved-path",
+      "source": "./plugins/engineering-paved-path",
+      "description": "Shared engineering-practice skills — React, component architecture, layered/hexagonal backend architecture, testing, security, diagramming — plus third-party Fastify/Next.js/TypeScript/Postgres/Drizzle skills.",
+      "category": "engineering"
+    },
+    {
+      "name": "sdd-engineering",
+      "source": "./plugins/sdd-engineering",
+      "description": "Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, plan-verifier — plus a run-plan orchestration skill and a retro workflow.",
+      "category": "engineering"
+    },
+    {
+      "name": "fastify-best-practices",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/mcollina/skills.git",
+        "path": "skills/fastify",
+        "ref": "main",
+        "sha": "879c9deb0d3a3551086e7c737577dc6cd76fd0c7"
+      },
+      "description": "Guides development of Fastify Node.js backend servers and REST APIs — routing, plugins, JSON Schema validation, error handling, hooks, TypeScript integration.",
+      "category": "backend",
+      "author": { "name": "Matteo Collina" },
+      "homepage": "https://github.com/mcollina/skills"
+    },
+    {
+      "name": "next-best-practices",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/vercel-labs/next-skills.git",
+        "path": "skills/next-best-practices",
+        "ref": "dc1de9caf7612d73f56a8dec3cb1bd6c9ec096b9",
+        "sha": "dc1de9caf7612d73f56a8dec3cb1bd6c9ec096b9"
+      },
+      "description": "Next.js best practices — file conventions, RSC boundaries, data patterns, async APIs, metadata, error handling, route handlers. Pinned to the last commit before this skill was removed from vercel-labs/next-skills and consolidated into vercel/next.js's own skills/ directory (2026-06-17) — re-point this entry there when re-vendoring.",
+      "category": "frontend",
+      "author": { "name": "Vercel Labs" },
+      "homepage": "https://github.com/vercel-labs/next-skills"
+    },
+    {
+      "name": "typescript-expert",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/sickn33/antigravity-awesome-skills.git",
+        "path": "skills/typescript-expert",
+        "ref": "main",
+        "sha": "09f2d8612d2e68a087377685e9c876bd737e1782"
+      },
+      "description": "TypeScript and JavaScript expert — type-level programming, performance optimization, monorepo management, migration strategies.",
+      "category": "engineering",
+      "author": { "name": "sickn33" },
+      "homepage": "https://github.com/sickn33/antigravity-awesome-skills"
+    },
+    {
+      "name": "postgresql-table-design",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/wshobson/agents.git",
+        "path": "plugins/database-design/skills/postgresql",
+        "ref": "main",
+        "sha": "b6af3711058190e4b5c5274b9758498fe626ec5a"
+      },
+      "description": "PostgreSQL-specific schema design — data types, indexing, constraints, performance patterns, advanced features.",
+      "category": "backend",
+      "author": { "name": "wshobson" },
+      "homepage": "https://github.com/wshobson/agents"
+    },
+    {
+      "name": "drizzle-orm-patterns",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/giuseppe-trisciuoglio/developer-kit.git",
+        "path": "plugins/developer-kit-typescript/skills/drizzle-orm-patterns",
+        "ref": "main",
+        "sha": "306f428f278d83722afdea44a7398dc46dab967f"
+      },
+      "description": "Drizzle ORM patterns — schema definition, CRUD operations, relations, queries, transactions, migrations.",
+      "category": "backend",
+      "author": { "name": "Giuseppe Trisciuoglio" },
+      "homepage": "https://github.com/giuseppe-trisciuoglio/developer-kit"
+    }
+  ]
 }
