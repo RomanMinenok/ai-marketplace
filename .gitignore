@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 .env.*
+
+# Marketplace UI (site/) — build outputs, never committed
+site/dist/
+site/public/data/
