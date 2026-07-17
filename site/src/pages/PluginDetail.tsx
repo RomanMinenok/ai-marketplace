@@ -5,7 +5,7 @@ import { kindLabel } from '../components/KindBadge'
 import CopyInstallButton from '../components/CopyInstallButton'
 import { ALL_KINDS } from '../lib/search'
 import type { Kind } from '../types'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function PluginDetail() {
   const { name } = useParams()

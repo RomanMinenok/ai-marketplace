@@ -10,42 +10,42 @@
     {
       "name": "react-tools",
       "source": "./plugins/react-tools",
-      "description": "Набір скілів і агент для рефакторингу React-кодових баз: розбір компонентів, міграція на hooks, автоформат при збереженні.",
+      "description": "A set of skills and an agent for refactoring React codebases: component decomposition, migration to hooks, format-on-save.",
       "category": "frontend",
       "keywords": ["react", "frontend", "refactoring", "hooks"]
     },
     {
       "name": "engineering-paved-path",
       "source": "./plugins/engineering-paved-path",
-      "description": "Канонічні стандарти команди: правила React, тестування й дизайну API, які підтягуються як контекст іншими плагінами.",
+      "description": "Canonical team standards: React, testing, and API design rules, pulled in as context by other plugins.",
       "category": "standards",
       "keywords": ["standards", "best-practices", "guidelines", "architecture"]
     },
     {
       "name": "mcp-postgres",
       "source": "./plugins/mcp-postgres",
-      "description": "MCP-сервер для безпечного read-only доступу до Postgres: інспекція схеми, пояснення запитів, вибірки під наглядом.",
+      "description": "MCP server for safe read-only access to Postgres: schema inspection, query explanation, supervised queries.",
       "category": "database",
       "keywords": ["database", "sql", "mcp", "postgres"]
     },
     {
       "name": "commit-helper",
       "source": "./plugins/commit-helper",
-      "description": "Генерує conventional commits за diff і тримає повідомлення охайними через pre-commit hook.",
+      "description": "Generates conventional commits from a diff and keeps messages clean via a pre-commit hook.",
       "category": "devex",
       "keywords": ["git", "commits", "conventional"]
     },
     {
       "name": "docs-writer",
       "source": "./plugins/docs-writer",
-      "description": "Пише й ревʼює документацію: API-довідники з коду, changelog-и та перевірка стилю markdown.",
+      "description": "Writes and reviews documentation: API references generated from code, changelogs, and markdown style checks.",
       "category": "documentation",
       "keywords": ["documentation", "markdown", "writing"]
     },
     {
       "name": "security-scan",
       "source": "./plugins/security-scan",
-      "description": "SAST-агент і hooks, що ловлять вразливості та секрети до того, як вони потраплять у репозиторій.",
+      "description": "SAST agent and hooks that catch vulnerabilities and secrets before they land in the repository.",
       "category": "security",
       "keywords": ["security", "audit", "sast", "secrets"]
     }

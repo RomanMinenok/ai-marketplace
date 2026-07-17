@@ -174,7 +174,7 @@ Notes:
 
 `plugins.json` (keyed by plugin name) — full detail payload for the plugin
 page: parsed README content, grouped list of artifacts by kind (with counts,
-matching the design's "Склад плагіна" section), dependencies (`plugin:artifact`
+matching the design's "Plugin composition" section), dependencies (`plugin:artifact`
 references, resolved to a clickable link if the target plugin exists in the
 catalog), and changelog entries.
 
@@ -222,7 +222,7 @@ correctly.
   "reset filters" action.
 - `#/plugin/:name` — **Plugin detail**: header (icon, displayName, version
   badge, compatibility badge, author, updated date), install command bar
-  (Copy + "View on GitHub"), "Склад плагіна" grouped by kind with per-artifact
+  (Copy + "View on GitHub"), "Plugin composition" grouped by kind with per-artifact
   cards (linking to artifact detail), Dependencies (linking to other plugins),
   README, Changelog.
 - `#/artifact/:kind/:plugin/:name` — **Artifact detail**: breadcrumb (Catalog
@@ -303,7 +303,7 @@ where `<plugin-name>` comes from the `pluginName` field of the search index
 entry — never hardcoded, and used identically whether copied from a card, a
 plugin detail page, or an artifact detail page (artifacts install their
 parent plugin, there is no per-artifact install command). A toast
-("Скопійовано в буфер" / "Copied to clipboard") confirms the action; the
+("Copied to clipboard") confirms the action; the
 button label itself also flips to a checkmark state for ~2s.
 
 ## G. Visual Design Notes

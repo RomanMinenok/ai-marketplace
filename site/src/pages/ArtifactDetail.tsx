@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import { useSiteData, installText } from '../lib/SiteDataContext'
 import KindBadge from '../components/KindBadge'
 import CopyInstallButton from '../components/CopyInstallButton'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function ArtifactDetail() {
   const { kind, plugin: pluginName, name } = useParams()

@@ -1,5 +1,5 @@
 # Engineering Paved Path
 
-Paved Path — це «вторований шлях» команди: набір скілів-довідників зі стандартами, на які посилаються інші плагіни через залежності.
+Paved Path is the team's "paved road": a set of reference skills with standards that other plugins reference via dependencies.
 
-Скіли не виконують дій, а надають структурований контекст правил. Це дозволяє тримати одне джерело істини для best-practices.
+The skills don't perform actions — they provide structured context for the rules. This keeps a single source of truth for best practices.

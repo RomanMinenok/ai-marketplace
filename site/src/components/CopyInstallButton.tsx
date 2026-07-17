@@ -1,5 +1,5 @@
 import { useSiteData } from '../lib/SiteDataContext'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 interface Props {
   text: string

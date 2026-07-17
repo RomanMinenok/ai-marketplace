@@ -1,6 +1,6 @@
 ---
-description: Правила написання React-компонентів, хуків і роботи зі станом.
+description: Rules for writing React components, hooks, and state handling.
 tools: []
 ---
 
-Довідник правил: композиція над наслідуванням, мінімізація стану, коректні залежності ефектів, доступність.
+A reference of rules: composition over inheritance, minimizing state, correct effect dependencies, accessibility.

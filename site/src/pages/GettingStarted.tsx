@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSiteData } from '../lib/SiteDataContext'
 import CopyInstallButton from '../components/CopyInstallButton'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function GettingStarted() {
   const navigate = useNavigate()

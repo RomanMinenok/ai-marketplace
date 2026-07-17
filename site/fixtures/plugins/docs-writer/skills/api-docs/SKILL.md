@@ -1,7 +1,7 @@
 ---
-description: Генерує markdown-довідник з TSDoc/JSDoc коментарів.
+description: Generates a markdown reference from TSDoc/JSDoc comments.
 tools: [Read, Write]
 invocation: /api-docs
 ---
 
-Парсить коментарі й типи, будує сторінки довідника з прикладами використання.
+Parses comments and types, builds reference pages with usage examples.

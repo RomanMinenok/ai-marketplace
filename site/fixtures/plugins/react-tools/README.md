@@ -1,7 +1,7 @@
 # React Tools
 
-React Tools — це збірка інструментів для роботи з React-кодом у Claude Code. Плагін орієнтований на великі кодові бази, де рефакторинг вручну коштує дорого.
+React Tools is a collection of tools for working with React code in Claude Code. The plugin is aimed at large codebases, where manual refactoring is expensive.
 
-Основний скіл `/refactor` аналізує обраний компонент, пропонує безпечні кроки декомпозиції та застосовує їх з попереднім переглядом diff.
+The main `/refactor` skill analyzes the selected component, proposes safe decomposition steps, and applies them with a diff preview.
 
-Агент `react-analyzer` будує карту залежностей компонентів і підсвічує проблемні місця: зайві ре-рендери, prop drilling, антипатерни хуків.
+The `react-analyzer` agent builds a map of component dependencies and highlights problem areas: unnecessary re-renders, prop drilling, hook anti-patterns.

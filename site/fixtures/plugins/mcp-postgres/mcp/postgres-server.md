@@ -1,8 +1,8 @@
 ---
-description: MCP-сервер з інструментами query, schema та explain-plan.
+description: MCP server with query, schema, and explain-plan tools.
 tools: [query, schema, explain-plan]
 ---
 
-Сервер підключається за DATABASE_URL і експонує інструменти для інспекції схеми та безпечних SELECT-запитів.
+The server connects via DATABASE_URL and exposes tools for schema inspection and safe SELECT queries.
 
-Усі запити проходять через whitelist і ліміт рядків.
+All queries pass through a whitelist and a row limit.

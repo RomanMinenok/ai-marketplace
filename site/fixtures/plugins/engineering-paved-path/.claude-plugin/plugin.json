@@ -2,7 +2,7 @@
   "name": "engineering-paved-path",
   "displayName": "Engineering Paved Path",
   "version": "1.8.2",
-  "description": "Канонічні стандарти команди: правила React, тестування й дизайну API, які підтягуються як контекст іншими плагінами.",
+  "description": "Canonical team standards: React, testing, and API design rules, pulled in as context by other plugins.",
   "author": { "name": "Platform Team" },
   "license": "MIT",
   "keywords": ["standards", "best-practices", "guidelines", "architecture"],

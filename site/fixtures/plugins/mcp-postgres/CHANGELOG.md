@@ -1,4 +1,4 @@
 # Changelog
 
 ## 0.9.1 — 2026-07-01
-- Додано інструмент explain-plan і кешування схеми.
+- Added the explain-plan tool and schema caching.

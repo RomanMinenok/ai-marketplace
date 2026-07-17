@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSiteData } from '../lib/SiteDataContext'
 import { ALL_KINDS, countBy, KIND_LABELS } from '../lib/search'
 import { KindDot } from '../components/KindBadge'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function Home() {
   const navigate = useNavigate()

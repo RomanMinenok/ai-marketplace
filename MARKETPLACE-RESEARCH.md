@@ -1,179 +1,179 @@
 # Marketplace Research
 
-> Дослідження: як правильно створити та вести репозиторій-маркетплейс плагінів Claude Code.
-> Зібрано з офіційної документації Claude Code, реального репозиторію `anthropics/claude-plugins-official`
-> та практик спільноти. Дата: 2026-07-17.
+> Research: how to properly create and maintain a Claude Code plugin marketplace repository.
+> Collected from the official Claude Code documentation, the real `anthropics/claude-plugins-official`
+> repository, and community practices. Date: 2026-07-17.
 >
-> **Призначення файлу:** довідник рішень і пасток. Після того, як репозиторій буде наповнено,
-> пройтися цим документом ще раз і звірити, що нічого не пропущено (див. §12 «Чек-ліст перевірки»).
+> **Purpose of this file:** a reference of decisions and pitfalls. Once the repository has been
+> populated, go through this document again and verify nothing was missed (see §12 "Verification checklist").
 
-## Зміст
+## Contents
 
-1. [Джерела](#1-джерела)
-2. [Модель: що таке маркетплейс і як він працює](#2-модель-що-таке-маркетплейс-і-як-він-працює)
-3. [Структура репозиторію](#3-структура-репозиторію)
-4. [Схема `marketplace.json`](#4-схема-marketplacejson)
-5. [Джерела плагінів (`source`)](#5-джерела-плагінів-source)
-6. [Схема `plugin.json`](#6-схема-pluginjson)
-7. [Версіонування — головна пастка](#7-версіонування--головна-пастка)
-8. [Кешування та резолвінг шляхів](#8-кешування-та-резолвінг-шляхів)
-9. [Перейменування та видалення плагінів](#9-перейменування-та-видалення-плагінів)
-10. [Валідація і CI](#10-валідація-і-ci)
-11. [Безпека та командна дистрибуція](#11-безпека-та-командна-дистрибуція)
-12. [Чек-ліст перевірки](#12-чек-ліст-перевірки)
-13. [Кандидати на плагіни з `dev-digest`](#13-кандидати-на-плагіни-з-dev-digest)
-14. [Відкриті питання](#14-відкриті-питання)
+1. [Sources](#1-sources)
+2. [The model: what a marketplace is and how it works](#2-the-model-what-a-marketplace-is-and-how-it-works)
+3. [Repository structure](#3-repository-structure)
+4. [`marketplace.json` schema](#4-marketplacejson-schema)
+5. [Plugin sources (`source`)](#5-plugin-sources-source)
+6. [`plugin.json` schema](#6-pluginjson-schema)
+7. [Versioning — the main pitfall](#7-versioning--the-main-pitfall)
+8. [Caching and path resolution](#8-caching-and-path-resolution)
+9. [Renaming and removing plugins](#9-renaming-and-removing-plugins)
+10. [Validation and CI](#10-validation-and-ci)
+11. [Security and team-wide distribution](#11-security-and-team-wide-distribution)
+12. [Verification checklist](#12-verification-checklist)
+13. [Plugin candidates from `dev-digest`](#13-plugin-candidates-from-dev-digest)
+14. [Open questions](#14-open-questions)
 
 ---
 
-## 1. Джерела
+## 1. Sources
 
-| Джерело | Що дало |
+| Source | What it gave |
 | --- | --- |
-| [Create and distribute a plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) | Основний гайд: структура, схема `marketplace.json`, типи джерел, хостинг, версіонування, troubleshooting |
-| [Plugins reference](https://code.claude.com/docs/en/plugins-reference) | Повна схема `plugin.json`, компоненти плагіна, шляхи, `${CLAUDE_PLUGIN_ROOT}` |
-| [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | Реальний приклад: структура репо, пінування на `ref`+`sha`, `renames`, 9 CI-workflow-ів |
-| [Your Claude Plugin Marketplace Needs More Than a Git Repo](https://www.mpt.solutions/your-claude-plugin-marketplace-needs-more-than-a-git-repo/) | Практики: чому голого git-репо мало, рев'ю як захист, пінування на SHA |
-| [Build Your Own Claude Code Marketplace](https://dev.to/nagell/build-your-own-claude-code-marketplace-scaffold-structure-and-auto-updates-4n3f) | Скафолдинг, автооновлення |
-| [Claude Code Plugins: From Personal Setup to Org Standard](https://claudefa.st/blog/tools/mcp-extensions/plugins-distribution) | Перехід від особистого набору до організаційного стандарту |
+| [Create and distribute a plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) | Main guide: structure, `marketplace.json` schema, source types, hosting, versioning, troubleshooting |
+| [Plugins reference](https://code.claude.com/docs/en/plugins-reference) | Full `plugin.json` schema, plugin components, paths, `${CLAUDE_PLUGIN_ROOT}` |
+| [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | Real-world example: repo structure, pinning by `ref`+`sha`, `renames`, 9 CI workflows |
+| [Your Claude Plugin Marketplace Needs More Than a Git Repo](https://www.mpt.solutions/your-claude-plugin-marketplace-needs-more-than-a-git-repo/) | Practices: why a bare git repo isn't enough, review as a safeguard, pinning to SHA |
+| [Build Your Own Claude Code Marketplace](https://dev.to/nagell/build-your-own-claude-code-marketplace-scaffold-structure-and-auto-updates-4n3f) | Scaffolding, auto-updates |
+| [Claude Code Plugins: From Personal Setup to Org Standard](https://claudefa.st/blog/tools/mcp-extensions/plugins-distribution) | Moving from a personal set of tools to an organizational standard |
 
-## 2. Модель: що таке маркетплейс і як він працює
+## 2. The model: what a marketplace is and how it works
 
-Маркетплейс — це **git-репозиторій із файлом-каталогом** `.claude-plugin/marketplace.json`. Він не хостить
-код плагінів обов'язково — він лише **каталог**, який каже, де їх шукати. Плагіни можуть лежати
-в тому ж репо (відносні шляхи) або в будь-яких інших репозиторіях/npm.
+A marketplace is a **git repository with a catalog file** `.claude-plugin/marketplace.json`. It doesn't
+necessarily host the plugin code itself — it's just a **catalog** that says where to find it. Plugins can
+live in the same repo (relative paths) or in any other repositories/npm.
 
-Життєвий цикл:
+Lifecycle:
 
-1. Ви пушите зміни в репозиторій маркетплейсу.
-2. Користувач додає маркетплейс: `/plugin marketplace add RomanMinenok/ai-marketplace`.
-3. Користувач ставить плагін: `/plugin install <plugin>@<marketplace-name>`.
-4. Оновлення каталогу: `/plugin marketplace update`; оновлення плагінів — `/plugin update` або автооновлення.
+1. You push changes to the marketplace repository.
+2. The user adds the marketplace: `/plugin marketplace add RomanMinenok/ai-marketplace`.
+3. The user installs a plugin: `/plugin install <plugin>@<marketplace-name>`.
+4. Catalog updates: `/plugin marketplace update`; plugin updates: `/plugin update` or auto-update.
 
-Claude Code копіює плагін у локальний кеш `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`.
+Claude Code copies the plugin into a local cache at `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`.
 
-**Ключова архітектурна ідея:** *marketplace source* і *plugin source* — різні речі.
-Перше — де взяти сам `marketplace.json` (задається користувачем при `add`, підтримує `ref`, але не `sha`).
-Друге — де взяти конкретний плагін (задається в полі `source` запису, підтримує і `ref`, і `sha`).
-Тобто один каталог може посилатися на десяток різних репо, кожен запінений незалежно.
+**Key architectural idea:** *marketplace source* and *plugin source* are different things.
+The former is where to get `marketplace.json` itself (set by the user on `add`, supports `ref`, but not `sha`).
+The latter is where to get a specific plugin (set in the entry's `source` field, supports both `ref` and `sha`).
+So a single catalog can point to a dozen different repos, each pinned independently.
 
-## 3. Структура репозиторію
+## 3. Repository structure
 
-Мінімум — це `.claude-plugin/marketplace.json` у корені. Реальний офіційний репозиторій Anthropic
-(`anthropics/claude-plugins-official`) виглядає так:
+The minimum is `.claude-plugin/marketplace.json` at the root. The real official Anthropic repository
+(`anthropics/claude-plugins-official`) looks like this:
 
 ```
 .claude-plugin/
   marketplace.json
 .github/
-  workflows/           # 9 workflow-ів (див. §10)
+  workflows/           # 9 workflows (see §10)
 .gitignore
 LICENSE
 README.md
-external_plugins/      # плагіни від зовнішніх авторів
-plugins/               # власні плагіни
+external_plugins/      # plugins from external authors
+plugins/               # in-house plugins
 ```
 
-Структура окремого плагіна всередині `plugins/`:
+Structure of an individual plugin inside `plugins/`:
 
 ```
 plugins/my-plugin/
   .claude-plugin/
-    plugin.json        # маніфест; опційний, але потрібен для метаданих
+    plugin.json        # manifest; optional, but needed for metadata
   skills/
     <skill-name>/
-      SKILL.md         # обов'язковий файл скіла
-      reference.md     # опційно
-      scripts/         # опційно
+      SKILL.md         # required skill file
+      reference.md     # optional
+      scripts/         # optional
   agents/
     reviewer.md
   commands/
-    thing.md           # «плоскі» .md-команди
+    thing.md           # "flat" .md commands
   hooks/
     hooks.json
 ```
 
-**Правила розташування:**
+**Placement rules:**
 
-- `marketplace.json` — **тільки** в `.claude-plugin/` у корені репо.
-- Відносні шляхи в `source` резолвляться від **кореня маркетплейсу** (теки, що містить `.claude-plugin/`),
-  а не від самої `.claude-plugin/`. Тобто `"./plugins/my-plugin"` → `<repo>/plugins/my-plugin`.
-- `..` у `source` заборонено — валідатор відхилить (`Path contains ".."`).
+- `marketplace.json` — **only** in `.claude-plugin/` at the repo root.
+- Relative paths in `source` resolve from the **marketplace root** (the folder that contains `.claude-plugin/`),
+  not from `.claude-plugin/` itself. So `"./plugins/my-plugin"` → `<repo>/plugins/my-plugin`.
+- `..` in `source` is forbidden — the validator rejects it (`Path contains ".."`).
 
-## 4. Схема `marketplace.json`
+## 4. `marketplace.json` schema
 
-### Обов'язкові поля
+### Required fields
 
-| Поле | Тип | Опис |
+| Field | Type | Description |
 | --- | --- | --- |
-| `name` | string | Ідентифікатор маркетплейсу, kebab-case, без пробілів. **Публічний**: користувачі бачать його як `/plugin install my-tool@<name>`. У користувача може бути лише один маркетплейс з даним ім'ям — додавання другого з тим самим ім'ям **замінює** перший. |
-| `owner` | object | `{ name: string (обов'язково), email?: string }` |
-| `plugins` | array | Список плагінів (може бути порожнім `[]` — це валідно, лише warning) |
+| `name` | string | Marketplace identifier, kebab-case, no spaces. **Public**: users see it as `/plugin install my-tool@<name>`. A user can only have one marketplace with a given name — adding a second one with the same name **replaces** the first. |
+| `owner` | object | `{ name: string (required), email?: string }` |
+| `plugins` | array | List of plugins (can be empty `[]` — that's valid, just a warning) |
 
-### Опційні поля
+### Optional fields
 
-| Поле | Тип | Опис |
+| Field | Type | Description |
 | --- | --- | --- |
-| `$schema` | string | URL JSON Schema для автокомпліту в редакторі. Claude Code ігнорує при завантаженні. Офіційний репо використовує `https://anthropic.com/claude-code/marketplace.schema.json` |
-| `description` | string | Короткий опис маркетплейсу (без нього — warning при валідації) |
-| `version` | string | Версія маніфесту каталогу |
-| `metadata.pluginRoot` | string | Базова тека, що додається до відносних шляхів. З `"./plugins"` можна писати `"source": "formatter"` замість `"source": "./plugins/formatter"` |
-| `allowCrossMarketplaceDependenciesOn` | array | Інші маркетплейси, від яких дозволено залежати. Не вказані — залежність блокується при встановленні |
-| `renames` | object | Мапа старе-ім'я → нове-ім'я або `null` (видалено). Потребує Claude Code ≥ 2.1.193. Див. §9 |
+| `$schema` | string | JSON Schema URL for editor autocomplete. Claude Code ignores it on load. The official repo uses `https://anthropic.com/claude-code/marketplace.schema.json` |
+| `description` | string | Short description of the marketplace (missing — warning on validation) |
+| `version` | string | Catalog manifest version |
+| `metadata.pluginRoot` | string | Base folder prepended to relative paths. With `"./plugins"` you can write `"source": "formatter"` instead of `"source": "./plugins/formatter"` |
+| `allowCrossMarketplaceDependenciesOn` | array | Other marketplaces this one is allowed to depend on. Not listed — the dependency is blocked on install |
+| `renames` | object | Map of old-name → new-name or `null` (removed). Requires Claude Code ≥ 2.1.193. See §9 |
 
-`description` і `version` також приймаються всередині `metadata` — для зворотної сумісності.
+`description` and `version` are also accepted inside `metadata` — for backward compatibility.
 
-### Зарезервовані назви
+### Reserved names
 
-Не можна використовувати: `claude-code-marketplace`, `claude-code-plugins`, `claude-plugins-official`,
+Cannot be used: `claude-code-marketplace`, `claude-code-plugins`, `claude-plugins-official`,
 `claude-plugins-community`, `claude-community`, `anthropic-marketplace`, `anthropic-plugins`, `agent-skills`,
 `anthropic-agent-skills`, `knowledge-work-plugins`, `life-sciences`, `claude-for-legal`,
 `claude-for-financial-services`, `financial-services-plugins`, `first-party-plugins`, `healthcare`.
 
-Також блокуються назви-імітації офіційних: `official-claude-plugins`, `anthropic-plugins-v2` тощо.
+Names imitating official ones are also blocked: `official-claude-plugins`, `anthropic-plugins-v2`, etc.
 
-⚠️ Claude Code перевіряє зарезервовані назви **при кожному завантаженні** маркетплейсу, не лише при додаванні.
-Якщо назва стане зарезервованою пізніше — маркетплейс перестане вантажитись із помилкою
-«registered from an untrusted source», і його доведеться перододати під іншим ім'ям.
+⚠️ Claude Code checks reserved names **on every load** of the marketplace, not just on add.
+If a name becomes reserved later, the marketplace will stop loading with a
+"registered from an untrusted source" error, and you'll have to re-publish it under another name.
 
-`dev-digest-ai-marketplace` / `ai-marketplace` — вільні.
+`dev-digest-ai-marketplace` / `ai-marketplace` — free.
 
-### Запис плагіна
+### Plugin entry
 
-**Обов'язкові:** `name` (kebab-case, публічний), `source`.
+**Required:** `name` (kebab-case, public), `source`.
 
-**Опційні (метадані):**
+**Optional (metadata):**
 
-| Поле | Тип | Опис |
+| Field | Type | Description |
 | --- | --- | --- |
-| `displayName` | string | Людиночитна назва в UI. Може містити пробіли й будь-який регістр. Не використовується для неймспейсингу. Потребує ≥ 2.1.143 |
-| `description` | string | Короткий опис |
-| `version` | string | Версія. Якщо задана — плагін запінено, оновлення лише при зміні рядка. Див. §7 |
-| `author` | object | `{ name (обов'язково), email? }` |
-| `homepage` | string | URL документації |
-| `repository` | string | URL вихідного коду |
-| `license` | string | SPDX-ідентифікатор (`MIT`, `Apache-2.0`) |
-| `keywords` | array | Теги для пошуку |
-| `category` | string | Категорія для організації |
-| `tags` | array | Теги для пошуку |
-| `strict` | boolean | Чи є `plugin.json` авторитетом для компонентів. За замовчуванням `true` |
-| `relevance` | object | Сигнали, коли пропонувати плагін. Діє лише для маркетплейсів у managed-allowlist. Потребує ≥ 2.1.152 |
-| `defaultEnabled` | boolean | Чи увімкнено після встановлення (default `true`). Має пріоритет над тим самим полем у `plugin.json`. Потребує ≥ 2.1.154 |
+| `displayName` | string | Human-readable name in the UI. Can contain spaces and any case. Not used for namespacing. Requires ≥ 2.1.143 |
+| `description` | string | Short description |
+| `version` | string | Version. If set, the plugin is pinned — updates only happen when the string changes. See §7 |
+| `author` | object | `{ name (required), email? }` |
+| `homepage` | string | Documentation URL |
+| `repository` | string | Source code URL |
+| `license` | string | SPDX identifier (`MIT`, `Apache-2.0`) |
+| `keywords` | array | Search tags |
+| `category` | string | Organizational category |
+| `tags` | array | Search tags |
+| `strict` | boolean | Whether `plugin.json` is the authority for components. Defaults to `true` |
+| `relevance` | object | Signals for when to suggest the plugin. Only applies to marketplaces on the managed allowlist. Requires ≥ 2.1.152 |
+| `defaultEnabled` | boolean | Whether it's enabled after install (default `true`). Takes priority over the same field in `plugin.json`. Requires ≥ 2.1.154 |
 
-**Опційні (шляхи компонентів):** `skills`, `commands`, `agents`, `hooks`, `mcpServers`, `lspServers` —
-string або array (для hooks/mcpServers/lspServers — ще й inline-об'єкт).
+**Optional (component paths):** `skills`, `commands`, `agents`, `hooks`, `mcpServers`, `lspServers` —
+string or array (for hooks/mcpServers/lspServers — also an inline object).
 
 ### `strict`
 
-| Значення | Поведінка |
+| Value | Behavior |
 | --- | --- |
-| `true` (default) | `plugin.json` — авторитет. Запис у каталозі може **доповнити** його; обидва джерела зливаються |
-| `false` | Запис у каталозі — **повне** визначення. Якщо плагін ще й має `plugin.json` з компонентами — конфлікт, плагін не завантажиться |
+| `true` (default) | `plugin.json` is the authority. The catalog entry can **supplement** it; both sources are merged |
+| `false` | The catalog entry is the **complete** definition. If the plugin also has a `plugin.json` with components — conflict, the plugin won't load |
 
-`strict: false` корисний, коли оператор маркетплейсу хоче повний контроль: репо плагіна дає «сирі» файли,
-а каталог вирішує, що з них експонувати.
+`strict: false` is useful when the marketplace operator wants full control: the plugin repo provides
+"raw" files, and the catalog decides what to expose from them.
 
-### Приклад
+### Example
 
 ```json
 {
@@ -188,21 +188,21 @@ string або array (для hooks/mcpServers/lspServers — ще й inline-об'
 }
 ```
 
-## 5. Джерела плагінів (`source`)
+## 5. Plugin sources (`source`)
 
-| Тип | Форма | Поля | Нотатки |
+| Type | Form | Fields | Notes |
 | --- | --- | --- | --- |
-| Відносний шлях | `"./plugins/my-plugin"` | — | Має починатися з `./`. Резолвиться від кореня маркетплейсу. `..` заборонено |
-| `github` | object | `repo` (обов'язково, `owner/repo`), `ref?`, `sha?` | |
-| `url` | object | `url` (обов'язково), `ref?`, `sha?` | Будь-який git URL (`https://` або `git@`). Суфікс `.git` опційний |
-| `git-subdir` | object | `url`, `path` (обов'язкові), `ref?`, `sha?` | Тека всередині репо. Sparse/partial clone — економить трафік на монорепо. `url` приймає й шорткат `owner/repo` |
-| `npm` | object | `package` (обов'язково), `version?`, `registry?` | Через `npm install`. `version` приймає діапазони (`^2.0.0`, `~1.5.0`) |
+| Relative path | `"./plugins/my-plugin"` | — | Must start with `./`. Resolves from the marketplace root. `..` forbidden |
+| `github` | object | `repo` (required, `owner/repo`), `ref?`, `sha?` | |
+| `url` | object | `url` (required), `ref?`, `sha?` | Any git URL (`https://` or `git@`). `.git` suffix optional |
+| `git-subdir` | object | `url`, `path` (required), `ref?`, `sha?` | Folder inside the repo. Sparse/partial clone — saves bandwidth on monorepos. `url` also accepts the `owner/repo` shorthand |
+| `npm` | object | `package` (required), `version?`, `registry?` | Via `npm install`. `version` accepts ranges (`^2.0.0`, `~1.5.0`) |
 
-**`ref` vs `sha`:** якщо задані обидва — діє `sha`, Claude Code фетчить і чекаутить саме цей коміт.
-На GitHub/GitLab/Bitbucket встановлення спрацює, навіть якщо гілку/тег з `ref` вже видалено, доки коміт
-досяжний. На серверах без фетчу за SHA (AWS CodeCommit) `ref` має існувати.
+**`ref` vs `sha`:** if both are set, `sha` wins — Claude Code fetches and checks out exactly that commit.
+On GitHub/GitLab/Bitbucket the install works even if the branch/tag from `ref` has already been deleted, as
+long as the commit is reachable. On servers without fetch-by-SHA (AWS CodeCommit), `ref` must exist.
 
-Приклад із офіційного репо Anthropic — рекомендований патерн для зовнішніх плагінів:
+Example from the official Anthropic repo — the recommended pattern for external plugins:
 
 ```json
 {
@@ -221,37 +221,38 @@ string або array (для hooks/mcpServers/lspServers — ще й inline-об'
 }
 ```
 
-### ⚠️ Пастка: відносні шляхи + URL-дистрибуція
+### ⚠️ Pitfall: relative paths + URL distribution
 
-Якщо користувач додає маркетплейс **прямим URL** на `marketplace.json`
-(`/plugin marketplace add https://example.com/marketplace.json`), завантажується **лише цей файл**.
-Відносні шляхи `"./plugins/..."` тоді мовчки не резолвляться → помилки «path not found».
-Для URL-дистрибуції треба використовувати `github`/`npm`/`url`-джерела.
-Для git-хостингу (наш випадок) відносні шляхи працюють — репо клонується цілком.
+If a user adds the marketplace via a **direct URL** to `marketplace.json`
+(`/plugin marketplace add https://example.com/marketplace.json`), **only that file** gets loaded.
+Relative paths `"./plugins/..."` then silently fail to resolve → "path not found" errors.
+For URL distribution you must use `github`/`npm`/`url` sources.
+For git hosting (our case), relative paths work — the whole repo is cloned.
 
-### Спільна тека `skills/` на кілька записів
+### Shared `skills/` folder across multiple entries
 
-Якщо кілька записів мають `source: "./"` і ділять одну теку `skills/` у корені, треба перелічити
-конкретні підтеки, щоб кожен запис вантажив лише своє:
+If several entries have `source: "./"` and share a single `skills/` folder at the root, you need to
+list the specific subfolders so each entry loads only its own:
 
 ```json
 "source": "./",
 "skills": ["./skills/code-review", "./skills/docs"]
 ```
 
-При `source` = корінь маркетплейсу перелічені шляхи — це **повний набір** для запису; інші теки в
-спільній `skills/` не завантажаться. Якщо вказати `./skills/` або корінь плагіна — повне сканування
-залишається. Якщо жоден із перелічених шляхів не існує — відпрацює дефолтне сканування.
+When `source` is the marketplace root, the listed paths become the **complete** set for that entry;
+other folders in the shared `skills/` won't load. If you specify `./skills/` or the plugin root, full
+scanning still applies. If none of the listed paths exist, the default scan kicks in.
 
-## 6. Схема `plugin.json`
+## 6. `plugin.json` schema
 
-Файл `.claude-plugin/plugin.json`. **Маніфест опційний** — без нього Claude Code автовиявляє компоненти
-в дефолтних локаціях і бере ім'я плагіна з імені теки. Маніфест потрібен для метаданих і кастомних шляхів.
+The file `.claude-plugin/plugin.json`. **The manifest is optional** — without it, Claude Code auto-discovers
+components in default locations and takes the plugin name from the folder name. The manifest is needed for
+metadata and custom paths.
 
-Якщо маніфест є — **`name` єдине обов'язкове поле**. Ім'я використовується для неймспейсингу:
-агент `agent-creator` у плагіні `plugin-dev` показується як `plugin-dev:agent-creator`.
+If a manifest exists, **`name` is the only required field**. The name is used for namespacing:
+the agent `agent-creator` in the `plugin-dev` plugin shows up as `plugin-dev:agent-creator`.
 
-### Повна схема
+### Full schema
 
 ```json
 {
@@ -276,79 +277,80 @@ string або array (для hooks/mcpServers/lspServers — ще й inline-об'
 }
 ```
 
-### Поля-шляхи компонентів
+### Component path fields
 
-| Поле | Поведінка |
+| Field | Behavior |
 | --- | --- |
-| `skills` | **Додає** до дефолтного сканування `skills/` (виняток — marketplace-root, див. §5) |
-| `commands` | **Замінює** дефолтну `commands/` |
-| `agents` | **Замінює** дефолтну `agents/` |
-| `hooks`, `mcpServers`, `lspServers` | Шляхи або inline-конфіг |
-| `outputStyles` | Замінює дефолтну `output-styles/` |
-| `experimental.themes`, `experimental.monitors` | Теми, фонові монітори |
-| `userConfig` | Значення, які запитуються в користувача при увімкненні |
-| `channels` | Декларації каналів для message injection (Telegram/Slack/Discord) |
-| `dependencies` | Інші плагіни-залежності, опційно з semver-обмеженням |
+| `skills` | **Adds** to the default `skills/` scan (exception — marketplace-root, see §5) |
+| `commands` | **Replaces** the default `commands/` |
+| `agents` | **Replaces** the default `agents/` |
+| `hooks`, `mcpServers`, `lspServers` | Paths or inline config |
+| `outputStyles` | Replaces the default `output-styles/` |
+| `experimental.themes`, `experimental.monitors` | Themes, background monitors |
+| `userConfig` | Values requested from the user on enable |
+| `channels` | Channel declarations for message injection (Telegram/Slack/Discord) |
+| `dependencies` | Other plugin dependencies, optionally with a semver constraint |
 
-### Нерозпізнані поля
+### Unrecognized fields
 
-Claude Code **ігнорує** нерозпізнані топ-рівневі поля. Тобто один `plugin.json` може одночасно бути
-маніфестом VS Code/Cursor-розширення, npm `package.json` або MCPB/DXT-бандла.
+Claude Code **ignores** unrecognized top-level fields. This means a single `plugin.json` can simultaneously
+be a manifest for a VS Code/Cursor extension, an npm `package.json`, or an MCPB/DXT bundle.
 
-`claude plugin validate` рапортує їх як **warnings**, не errors; якщо поле на 1–2 символи відрізняється
-від відомого — підкаже правильне. Але **неправильний тип** розпізнаного поля — це помилка завантаження
-(наприклад, `keywords` рядком замість масиву).
+`claude plugin validate` reports them as **warnings**, not errors; if a field differs by 1–2 characters
+from a known one, it suggests the correct name. But an **incorrect type** for a recognized field is a
+load error (e.g. `keywords` as a string instead of an array).
 
-`--strict` перетворює warnings на errors — саме це треба в CI.
+`--strict` turns warnings into errors — that's what you want in CI.
 
 ### `defaultEnabled`
 
-`defaultEnabled: false` → плагін ставиться вимкненим, користувач вмикає вручну. Корисно для плагінів,
-що додають вартість або лізуть у зовнішні сервіси. Пріоритети (від вищого):
+`defaultEnabled: false` → the plugin installs disabled, the user enables it manually. Useful for plugins
+that add cost or reach out to external services. Priority order (highest first):
 
-1. Явна настройка користувача в `enabledPlugins` (будь-який scope) — переживає оновлення й переустановки.
-2. Вимога залежності — якщо плагін потрібен іншому активному, Claude Code пише `true`.
-3. `defaultEnabled` у записі маркетплейсу.
-4. `defaultEnabled` у `plugin.json`.
+1. Explicit user setting in `enabledPlugins` (any scope) — survives updates and reinstalls.
+2. Dependency requirement — if a plugin is needed by another active one, Claude Code writes `true`.
+3. `defaultEnabled` in the marketplace entry.
+4. `defaultEnabled` in `plugin.json`.
 
-## 7. Версіонування — головна пастка
+## 7. Versioning — the main pitfall
 
-Версія визначає шлях у кеші та детект оновлень: якщо резолвлена версія збігається з наявною в
-користувача, `/plugin update` і автооновлення **пропускають** плагін.
+The version determines the cache path and update detection: if the resolved version matches the one the
+user already has, `/plugin update` and auto-update **skip** the plugin.
 
-Порядок резолву (перше задане виграє):
+Resolution order (first one set wins):
 
-1. `version` у `plugin.json` плагіна
-2. `version` у записі маркетплейсу
-3. **git commit SHA** джерела плагіна
+1. `version` in the plugin's `plugin.json`
+2. `version` in the marketplace entry
+3. **git commit SHA** of the plugin's source
 
-### Два робочі підходи
+### Two working approaches
 
-| Підхід | Коли | Як |
+| Approach | When | How |
 | --- | --- | --- |
-| **Без `version`** | Внутрішні / активно розроблювані плагіни | Не вказувати `version` взагалі → кожен коміт = нова версія. Найпростіше |
-| **З `version`** | Публічні / стабільні релізи | Вказати `version` і **бампати з кожним релізом**. Інакше нові коміти нічого не змінять для наявних користувачів |
+| **No `version`** | Internal / actively developed plugins | Don't set `version` at all → every commit is a new version. Simplest |
+| **With `version`** | Public / stable releases | Set `version` and **bump it with every release**. Otherwise new commits won't change anything for existing users |
 
-⚠️ **Ніколи не задавати `version` в обох місцях.** Claude Code завжди бере значення з `plugin.json`
-**без попередження** — застарілий маніфест мовчки замаскує версію, задану в `marketplace.json`.
+⚠️ **Never set `version` in both places.** Claude Code always takes the value from `plugin.json`
+**without warning** — a stale manifest will silently mask the version set in `marketplace.json`.
 
 ### Release channels
 
-Два маркетплейси, що вказують на різні `ref`/`sha` того самого репо (`stable-tools` / `latest-tools`),
-роздаються різним групам через managed settings.
+Two marketplaces pointing at different `ref`/`sha` of the same repo (`stable-tools` / `latest-tools`)
+are distributed to different groups via managed settings.
 
-⚠️ Кожен канал має резолвитись у **різну** версію. З явними версіями — `plugin.json` має декларувати
-різний `version` на кожному запіненому ref. Без `version` — різні SHA вже розрізняють канали.
-Якщо два ref резолвляться в однаковий рядок версії — Claude Code вважає їх ідентичними й пропускає оновлення.
+⚠️ Each channel must resolve to a **different** version. With explicit versions — `plugin.json` must
+declare a different `version` on each pinned ref. Without `version`, different SHAs already distinguish
+the channels. If two refs resolve to the same version string, Claude Code considers them identical and
+skips the update.
 
-## 8. Кешування та резолвінг шляхів
+## 8. Caching and path resolution
 
-Плагіни **копіюються** в кеш `~/.claude/plugins/cache`, а не використовуються in-place. Наслідки:
+Plugins are **copied** into the `~/.claude/plugins/cache` cache, not used in-place. Consequences:
 
-- ❌ Шляхи назовні теки плагіна (`../shared-utils`) **не працюють** — ці файли не копіюються.
-- ✅ Для спільних файлів між плагінами — **симлінки**.
-- ✅ У хуках і MCP-конфігах шляхи писати через **`${CLAUDE_PLUGIN_ROOT}`**.
-- ✅ Для залежностей/стану, що мають пережити оновлення плагіна — **`${CLAUDE_PLUGIN_DATA}`**.
+- ❌ Paths outside the plugin's folder (`../shared-utils`) **don't work** — those files aren't copied.
+- ✅ For files shared between plugins — use **symlinks**.
+- ✅ In hooks and MCP configs, write paths using **`${CLAUDE_PLUGIN_ROOT}`**.
+- ✅ For dependencies/state that must survive a plugin update — **`${CLAUDE_PLUGIN_DATA}`**.
 
 ```json
 "hooks": {
@@ -365,13 +367,13 @@ Claude Code **ігнорує** нерозпізнані топ-рівневі п
 }
 ```
 
-## 9. Перейменування та видалення плагінів
+## 9. Renaming and removing plugins
 
-`name` плагіна — **стабільний ідентифікатор**. Користувачі посилаються на нього в `enabledPlugins`,
-`pluginConfigs` і командах `/plugin install`. Зміна `name` ламає **всі** наявні інсталяції.
+A plugin's `name` is a **stable identifier**. Users reference it in `enabledPlugins`,
+`pluginConfigs`, and `/plugin install` commands. Changing `name` breaks **all** existing installs.
 
-- Щоб змінити лише підпис в UI — `displayName`, `name` не чіпати.
-- Щоб реально перейменувати/видалити — топ-рівневе поле `renames`:
+- To change only the UI label — use `displayName`, don't touch `name`.
+- To actually rename/remove — use the top-level `renames` field:
 
 ```json
 {
@@ -385,20 +387,20 @@ Claude Code **ігнорує** нерозпізнані топ-рівневі п
 }
 ```
 
-Поведінка: Claude Code вантажить плагін під новим ім'ям, показує однорядкове повідомлення й **переписує**
-старий ключ на новий у user/project/local scope для `enabledPlugins` і `pluginConfigs`. Для `null` —
-дропає ключ і каже, що плагін видалено. Для віддалених джерел (`github`, `npm`) після перейменування
-буде `plugin-cache-miss` — користувач має раз запустити `/plugin install`.
+Behavior: Claude Code loads the plugin under the new name, shows a one-line message, and **rewrites**
+the old key to the new one in the user/project/local scope for `enabledPlugins` and `pluginConfigs`.
+For `null`, it drops the key and says the plugin was removed. For remote sources (`github`, `npm`),
+after renaming there will be a `plugin-cache-miss` — the user needs to run `/plugin install` once.
 
-**Правила:**
+**Rules:**
 
-- `renames` — **append-only історія**. Не редагувати старі записи, додавати нові: Claude Code йде ланцюжком.
-- `claude plugin validate .` відхиляє цикли й ланцюжки, що не закінчуються на `null` або на ім'я зі списку `plugins`.
-- Managed/policy settings read-only → там перейменування не перепишеться автоматично, повідомлення
-  повторюватиметься, доки адмін не оновить `enabledPlugins`.
-- Claude Code < 2.1.193 ігнорує `renames` і рапортує `plugin-not-found`.
+- `renames` is an **append-only history**. Don't edit old entries, add new ones — Claude Code follows the chain.
+- `claude plugin validate .` rejects cycles and chains that don't terminate at `null` or at a name from the `plugins` list.
+- Managed/policy settings are read-only → renaming won't rewrite automatically there; the message will
+  keep repeating until an admin updates `enabledPlugins`.
+- Claude Code < 2.1.193 ignores `renames` and reports `plugin-not-found`.
 
-Офіційний репо Anthropic активно цим користується:
+The official Anthropic repo actively uses this:
 
 ```json
 "renames": {
@@ -410,42 +412,42 @@ Claude Code **ігнорує** нерозпізнані топ-рівневі п
 }
 ```
 
-## 10. Валідація і CI
+## 10. Validation and CI
 
 ```bash
-claude plugin validate .                    # маркетплейс: схема, дублі імен, path traversal
-claude plugin validate ./plugins/my-plugin  # плагін: plugin.json + frontmatter скілів/агентів/хуків
-claude plugin validate ./plugins/my-plugin --strict   # warnings → errors (для CI)
+claude plugin validate .                    # marketplace: schema, duplicate names, path traversal
+claude plugin validate ./plugins/my-plugin  # plugin: plugin.json + skill/agent/hook frontmatter
+claude plugin validate ./plugins/my-plugin --strict   # warnings → errors (for CI)
 ```
 
-Усередині сесії: `/plugin validate .`
+Inside a session: `/plugin validate .`
 
-**Що перевіряє валідатор маркетплейсу:** схему `marketplace.json`, дублікати імен плагінів,
-path traversal у `source`. Для записів із локальним шляхом — ще й їхній `plugin.json`, і попереджає,
-коли `version` у записі не збігається з `plugin.json`. Проблеми в `plugin.json` префіксуються індексом
-запису: `plugins[2] plugin.json →`.
+**What the marketplace validator checks:** the `marketplace.json` schema, duplicate plugin names,
+path traversal in `source`. For entries with a local path — also their `plugin.json`, and it warns
+when the `version` in the entry doesn't match `plugin.json`. Problems in `plugin.json` are prefixed
+with the entry index: `plugins[2] plugin.json →`.
 
-### Типові помилки
+### Common errors
 
-| Помилка | Причина | Рішення |
+| Error | Cause | Fix |
 | --- | --- | --- |
-| `File not found: .claude-plugin/marketplace.json` | Немає маніфесту | Створити з обов'язковими полями |
-| `Invalid JSON syntax: Unexpected token...` | Синтаксис JSON | Коми, лапки |
-| `Duplicate plugin name "x" found in marketplace` | Два плагіни з однаковим `name` | Унікальні імена |
-| `plugins[0].source: Path contains ".."` | `..` у шляху | Шляхи від кореня маркетплейсу без `..` |
-| `YAML frontmatter failed to parse: ...` | Битий YAML у скілі/агенті/команді | Файл завантажиться без метаданих. Рапортується лише при валідації теки плагіна |
-| `Invalid JSON syntax: ...` (hooks.json) | Битий `hooks/hooks.json` | **Блокує завантаження всього плагіна** |
+| `File not found: .claude-plugin/marketplace.json` | No manifest | Create it with the required fields |
+| `Invalid JSON syntax: Unexpected token...` | JSON syntax | Commas, quotes |
+| `Duplicate plugin name "x" found in marketplace` | Two plugins with the same `name` | Unique names |
+| `plugins[0].source: Path contains ".."` | `..` in path | Paths from the marketplace root, no `..` |
+| `YAML frontmatter failed to parse: ...` | Broken YAML in a skill/agent/command | The file loads without metadata. Only reported when validating the plugin folder |
+| `Invalid JSON syntax: ...` (hooks.json) | Broken `hooks/hooks.json` | **Blocks loading of the whole plugin** |
 
-### Warnings (не блокують)
+### Warnings (non-blocking)
 
-- `Marketplace has no plugins defined` — порожній `plugins: []` валідний
-- `No marketplace description provided` — додати топ-рівневий `description`
-- `Plugin name "x" is not kebab-case` — ⚠️ документація це обіцяє, але **на практиці не спрацьовує** (див. нижче)
+- `Marketplace has no plugins defined` — an empty `plugins: []` is valid
+- `No marketplace description provided` — add a top-level `description`
+- `Plugin name "x" is not kebab-case` — ⚠️ the docs promise this, but **in practice it doesn't fire** (see below)
 
-### ⚠️ Що валідатор насправді НЕ ловить (перевірено на v2.1.212)
+### ⚠️ What the validator actually does NOT catch (verified on v2.1.212)
 
-Ці висновки з **емпіричної перевірки на фікстурах**, а не з документації. Наведений маніфест
-проходить `claude plugin validate` **чисто, навіть із `--strict`**:
+These findings come from **empirical testing on fixtures**, not from the docs. The manifest below
+passes `claude plugin validate` **cleanly, even with `--strict`**:
 
 ```json
 {
@@ -458,73 +460,74 @@ path traversal у `source`. Для записів із локальним шля
 }
 ```
 
-| Проблема | Документація обіцяє | Реальність v2.1.212 |
+| Problem | Docs promise | Reality on v2.1.212 |
 | --- | --- | --- |
-| Зарезервована назва маркетплейсу (`anthropic-plugins`) | Блокується при завантаженні | ✗ Валідатор мовчить |
-| Не-kebab назва маркетплейсу (`Test_Marketplace`) | — | ✗ Мовчить |
-| Не-kebab назва плагіна (`Bad_Name`) | Warning | ✗ Мовчить |
-| `source` вказує на неіснуючу теку | — | ✗ Мовчить — ламається лише в користувача при `/plugin install` |
-| `plugin.json.name` ≠ імені запису | За дизайном дозволено (виграє запис) | ✗ Мовчить (очікувано) |
+| Reserved marketplace name (`anthropic-plugins`) | Blocked on load | ✗ Validator stays silent |
+| Non-kebab-case marketplace name (`Test_Marketplace`) | — | ✗ Silent |
+| Non-kebab-case plugin name (`Bad_Name`) | Warning | ✗ Silent |
+| `source` points to a nonexistent folder | — | ✗ Silent — only breaks for the user on `/plugin install` |
+| `plugin.json.name` ≠ entry name | Allowed by design (entry wins) | ✗ Silent (expected) |
 
-Що **таки** ловить (теж перевірено): `..` у `source` (error), дублікати імен плагінів (error),
-відсутність `version`/`description`/`author` у `plugin.json` (warnings), порожній `plugins: []` (warning).
+What it **does** catch (also verified): `..` in `source` (error), duplicate plugin names (error),
+missing `version`/`description`/`author` in `plugin.json` (warnings), an empty `plugins: []` (warning).
 
-**Помилки обривають решту перевірок.** З `..` у списку дублікати вже не рапортуються — їх видно лише
-після виправлення першої помилки. Тобто зелений валідатор ≠ «все перевірено», і прогін варто повторювати
-після кожного виправлення.
+**Errors abort the rest of the checks.** With `..` in the list, duplicates are no longer reported —
+they only show up after fixing the first error. In other words, a green validator ≠ "everything checked",
+and it's worth re-running after each fix.
 
-Саме ці прогалини закриває `scripts/validate-marketplace.mjs` — він не дублює офіційний валідатор.
+`scripts/validate-marketplace.mjs` closes exactly these gaps — it doesn't duplicate the official validator.
 
-### `--strict` падає на порожньому каталозі
+### `--strict` fails on an empty catalog
 
-`claude plugin validate . --strict` виходить з **кодом 1**, доки `plugins: []` порожній
-(`Marketplace has no plugins defined` — warning, а `--strict` робить з нього error).
-Тому CI використовує `--strict` лише для окремих плагінів, а каталог валідує без нього.
-Перемкнути можна буде після появи першого плагіна.
+`claude plugin validate . --strict` exits with **code 1** as long as `plugins: []` is empty
+(`Marketplace has no plugins defined` is a warning, and `--strict` turns it into an error).
+So CI uses `--strict` only for individual plugins, and validates the catalog without it.
+This can be switched once the first plugin lands.
 
-### CI не потребує авторизації
+### CI needs no authorization
 
-Перевірено: `claude plugin validate` відпрацьовує headless **без `ANTHROPIC_API_KEY` і навіть без `HOME`**.
-Отже, в GitHub Actions достатньо `npm install -g @anthropic-ai/claude-code` — секрет не потрібен.
+Verified: `claude plugin validate` runs headless **without `ANTHROPIC_API_KEY` and even without `HOME`**.
+So in GitHub Actions, `npm install -g @anthropic-ai/claude-code` is enough — no secret needed.
 
-### Що робить офіційний репо Anthropic
+### What the official Anthropic repo does
 
-Дев'ять workflow-ів у `.github/workflows/`:
+Nine workflows in `.github/workflows/`:
 
-| Workflow | Призначення |
+| Workflow | Purpose |
 | --- | --- |
-| `validate-plugins.yml` | Валідація плагінів |
-| `validate-frontmatter.yml` | Перевірка YAML-frontmatter скілів/агентів |
-| `validate-licenses.yml` | Перевірка ліцензій |
-| `scan-plugins.yml` | Сканування вмісту |
-| `bump-plugin-shas.yml` | Автобамп запінених SHA |
-| `revert-failed-bumps.yml` | Відкат невдалих бампів |
-| `check-mcp-urls.yml` | Перевірка доступності MCP-URL |
-| `close-external-prs.yml` | Політика зовнішніх PR |
-| `external-pr-scope-guard.yml` | Обмеження scope зовнішніх PR |
+| `validate-plugins.yml` | Plugin validation |
+| `validate-frontmatter.yml` | Skill/agent YAML frontmatter check |
+| `validate-licenses.yml` | License check |
+| `scan-plugins.yml` | Content scanning |
+| `bump-plugin-shas.yml` | Auto-bump pinned SHAs |
+| `revert-failed-bumps.yml` | Revert failed bumps |
+| `check-mcp-urls.yml` | MCP URL availability check |
+| `close-external-prs.yml` | External PR policy |
+| `external-pr-scope-guard.yml` | External PR scope restriction |
 
-Мінімум для нас: один workflow на `pull_request` з `claude plugin validate . --strict`.
+The minimum for us: one workflow on `pull_request` with `claude plugin validate . --strict`.
 
-## 11. Безпека та командна дистрибуція
+## 11. Security and team-wide distribution
 
-### Безпека
+### Security
 
-Плагіни виконують **повністю довірений код** у сесії розробника: скіли запускають shell-команди,
-MCP-сервери ставлять довільні бінарники, хуки перехоплюють кожен виклик тулзи.
+Plugins execute **fully trusted code** in the developer's session: skills run shell commands,
+MCP servers install arbitrary binaries, hooks intercept every tool call.
 
-Захист — це **allowlist маркетплейсів + runtime-хуки + людське код-рев'ю перед потраплянням у каталог**,
-а не автоматичні сканери.
+The defense is an **allowlist of marketplaces + runtime hooks + human review before anything lands
+in the catalog**, not automatic scanners.
 
-Практика спільноти: **пінити на commit SHA, а не на тег** — теги рухаються, коміти ні. Це спосіб
-детерміновано роздавати плагіни на велику організацію без випадкових апгрейдів на зламану версію.
+Community practice: **pin to a commit SHA, not a tag** — tags move, commits don't. This is how you
+deterministically distribute plugins across a large organization without accidental upgrades to a
+broken version.
 
-Типова помилка: покласти теку зі скілами в приватний GitHub-репо **без** `marketplace.json`. Це пропускає
-весь шар маркетплейсу — немає пінування версій, немає enforcement через managed settings, немає чистого
-механізму оновлення. Працює на 5 людей, ламається на 500.
+Common mistake: putting a folder of skills in a private GitHub repo **without** `marketplace.json`.
+This skips the entire marketplace layer — no version pinning, no enforcement via managed settings,
+no clean update mechanism. Works for 5 people, breaks at 500.
 
-### Автопідключення для команди
+### Auto-connect for a team
 
-`.claude/settings.json` у робочому репозиторії (не в репо маркетплейсу):
+`.claude/settings.json` in the working repository (not the marketplace repo):
 
 ```json
 {
@@ -539,46 +542,45 @@ MCP-сервери ставлять довільні бінарники, хук�
 }
 ```
 
-Стан маркетплейсів зберігається **раз на користувача** в `~/.claude/plugins/known_marketplaces.json`,
-не по проєктах. При роботі з git worktree відносні `directory`/`file`-шляхи резолвляться від головного
-checkout — усі worktree ділять одну локацію маркетплейсу.
+Marketplace state is stored **once per user** in `~/.claude/plugins/known_marketplaces.json`,
+not per project. When working with a git worktree, relative `directory`/`file` paths resolve from
+the main checkout — all worktrees share one marketplace location.
 
-### Managed-обмеження (для організації)
+### Managed restrictions (for an organization)
 
-`strictKnownMarketplaces` у managed settings:
+`strictKnownMarketplaces` in managed settings:
 
-| Значення | Поведінка |
+| Value | Behavior |
 | --- | --- |
-| Undefined | Без обмежень |
-| `[]` | Повний локдаун — жодних нових маркетплейсів |
-| Список джерел | Лише ті, що точно збігаються |
+| Undefined | No restrictions |
+| `[]` | Full lockdown — no new marketplaces |
+| List of sources | Only exact matches |
 
-Матчинг **точний**, без нормалізації URL: трейлінг-слеш, суфікс `.git`, `ssh://` vs `https://` — різні
-значення. Якщо репо клонується кількома формами URL — краще `hostPattern`-запис:
+Matching is **exact**, with no URL normalization: trailing slash, `.git` suffix, `ssh://` vs `https://`
+are different values. If the repo gets cloned via multiple URL forms, a `hostPattern` entry is better:
 
 ```json
 { "strictKnownMarketplaces": [{ "source": "hostPattern", "hostPattern": "^github\\.example\\.com$" }] }
 ```
 
-Перевірка виконується **до** будь-якої мережевої/файлової операції — на add, install, update, refresh
-і автооновленні.
+The check runs **before** any network/file operation — on add, install, update, refresh, and auto-update.
 
-### Приватні репозиторії
+### Private repositories
 
-- Ручні install/update використовують ваші git credential helpers (`gh auth login`, Keychain) — працює як у терміналі.
-- SSH працює, якщо хост уже в `known_hosts`, а ключ у `ssh-agent` (Claude Code глушить інтерактивні промпти).
-- ⚠️ **Фонові автооновлення** за замовчуванням **вимикають** credential helpers для `git pull` → HTTPS до
-  приватних репо не автентифікується. SSH-remote не зачеплений. При фейлі — повний re-clone, який
-  credentials використовує, але може впертися в таймаут на великих репо.
-- `CLAUDE_CODE_PLUGIN_KEEP_MARKETPLACE_ON_FAILURE=1` — не видаляти клон при фейлі пулу.
-- `CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS` — таймаут git-операцій (дефолт 120 с).
-- `GITHUB_TOKEN` у середовищі **сам по собі не вмикає** фонову автентифікацію — токен діє лише через
-  налаштований credential helper.
-- GitHub `owner/repo` шорткати клонуються через **SSH** за замовчуванням; `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` → HTTPS.
+- Manual install/update use your git credential helpers (`gh auth login`, Keychain) — works like in a terminal.
+- SSH works if the host is already in `known_hosts` and the key is in `ssh-agent` (Claude Code suppresses interactive prompts).
+- ⚠️ **Background auto-updates** by default **disable** credential helpers for `git pull` → HTTPS to
+  private repos won't authenticate. SSH remotes are unaffected. On failure, a full re-clone happens,
+  which does use credentials, but may hit a timeout on large repos.
+- `CLAUDE_CODE_PLUGIN_KEEP_MARKETPLACE_ON_FAILURE=1` — don't delete the clone on a pull failure.
+- `CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS` — git operation timeout (default 120s).
+- `GITHUB_TOKEN` in the environment **alone doesn't enable** background authentication — the token only
+  works through a configured credential helper.
+- GitHub `owner/repo` shortcuts clone via **SSH** by default; `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` → HTTPS.
 
-### Пресід для контейнерів/CI
+### Seeding for containers/CI
 
-`CLAUDE_CODE_PLUGIN_SEED_DIR` — тека, що дзеркалить `~/.claude/plugins`:
+`CLAUDE_CODE_PLUGIN_SEED_DIR` — a folder that mirrors `~/.claude/plugins`:
 
 ```
 $CLAUDE_CODE_PLUGIN_SEED_DIR/
@@ -587,51 +589,51 @@ $CLAUDE_CODE_PLUGIN_SEED_DIR/
   cache/<marketplace>/<plugin>/<version>/...
 ```
 
-Read-only, автооновлення вимкнені, seed має пріоритет над конфігом користувача.
-Будувати можна через `CLAUDE_CODE_PLUGIN_CACHE_DIR=/opt/claude-seed claude plugin install ...`.
+Read-only, auto-updates disabled, the seed takes priority over user config.
+Can be built via `CLAUDE_CODE_PLUGIN_CACHE_DIR=/opt/claude-seed claude plugin install ...`.
 
-## 12. Чек-ліст перевірки
+## 12. Verification checklist
 
-Пройтися після наповнення репозиторію:
+Go through this after populating the repository:
 
-- [ ] `.claude-plugin/marketplace.json` існує в корені, `name` kebab-case і не з reserved-списку
-- [ ] `owner.name` заповнений реальним значенням (не плейсхолдером)
-- [ ] Топ-рівневий `description` присутній (інакше warning)
-- [ ] Усі `name` плагінів унікальні й kebab-case (інакше синк із claude.ai відхилить)
-- [ ] Жоден `source` не містить `..`
-- [ ] Стратегія версій обрана свідомо і **не дублюється** між `plugin.json` і `marketplace.json`
-- [ ] Немає посилань назовні теки плагіна (`../`); де треба — симлінки
-- [ ] У хуках/MCP використано `${CLAUDE_PLUGIN_ROOT}`, а не відносні/абсолютні шляхи
-- [ ] `claude plugin validate . --strict` зелений
-- [ ] `claude plugin validate ./plugins/<кожен>` зелений
-- [ ] CI-workflow на `pull_request` працює
-- [ ] Локальний прогін: `/plugin marketplace add ./` → `/plugin install <plugin>@<name>` → скіл викликається
-- [ ] `renames` заповнено, якщо щось перейменовували/видаляли
-- [ ] README пояснює, як підключити й що всередині
+- [ ] `.claude-plugin/marketplace.json` exists at the root, `name` is kebab-case and not on the reserved list
+- [ ] `owner.name` is filled in with a real value (not a placeholder)
+- [ ] A top-level `description` is present (otherwise a warning)
+- [ ] All plugin `name`s are unique and kebab-case (otherwise sync with claude.ai will reject them)
+- [ ] No `source` contains `..`
+- [ ] A versioning strategy was chosen deliberately and is **not duplicated** between `plugin.json` and `marketplace.json`
+- [ ] No references outside a plugin's folder (`../`); use symlinks where needed
+- [ ] Hooks/MCP configs use `${CLAUDE_PLUGIN_ROOT}`, not relative/absolute paths
+- [ ] `claude plugin validate . --strict` is green
+- [ ] `claude plugin validate ./plugins/<each>` is green
+- [ ] CI workflow on `pull_request` works
+- [ ] Local dry run: `/plugin marketplace add ./` → `/plugin install <plugin>@<name>` → the skill gets invoked
+- [ ] `renames` is filled in if anything was renamed/removed
+- [ ] README explains how to connect and what's inside
 
-## 13. Кандидати на плагіни з `dev-digest`
+## 13. Plugin candidates from `dev-digest`
 
-> Інвентар на 2026-07-17. **Що саме переносити — ще не вирішено.**
+> Inventory as of 2026-07-17. **What exactly to migrate is still undecided.**
 
-### Агенти (`~/Workspace/dev-digest/.claude/agents/`)
+### Agents (`~/Workspace/dev-digest/.claude/agents/`)
 
-Покривають цикл **Spec → Plan → Implement → Test → Verify → Review → Document**:
+Cover the **Spec → Plan → Implement → Test → Verify → Review → Document** cycle:
 
-| Агент | Модель | Роль |
+| Agent | Model | Role |
 | --- | --- | --- |
-| `spec-creator` | opus | Пише SDD-специфікації, EARS-питання, лише `/specs/**` + `/design/**` |
-| `researcher` | sonnet | Read-only дослідник — факти з коду або вебу |
-| `implementation-planner` | opus | Read-only архітектор — Implementation Plan, Onion, розбиття на задачі |
-| `implementer` | sonnet | Виконує **одну** задачу плану; опційна worktree-ізоляція |
-| `test-writer` | sonnet · worktree | Пише/розширює тести, ітерує до зеленого |
-| `architecture-reviewer` | opus | Read-only архітектурне рев'ю — Onion dependency rule, межі шарів, цикли |
-| `architecture-reviewer-lite` | — | Полегшена версія |
-| `plan-verifier` | opus | Read-only аудит повноти — traceability matrix вимога→`path:line` |
-| `doc-writer` | sonnet | Документація з наявного матеріалу, Diátaxis, Mermaid |
+| `spec-creator` | opus | Writes SDD specs, EARS questions, only `/specs/**` + `/design/**` |
+| `researcher` | sonnet | Read-only researcher — facts from code or the web |
+| `implementation-planner` | opus | Read-only architect — Implementation Plan, Onion, task breakdown |
+| `implementer` | sonnet | Executes **one** plan task; optional worktree isolation |
+| `test-writer` | sonnet · worktree | Writes/extends tests, iterates until green |
+| `architecture-reviewer` | opus | Read-only architecture review — Onion dependency rule, layer boundaries, cycles |
+| `architecture-reviewer-lite` | — | Lightweight version |
+| `plan-verifier` | opus | Read-only completeness audit — requirement→`path:line` traceability matrix |
+| `doc-writer` | sonnet | Documentation from existing material, Diátaxis, Mermaid |
 
-### Скіли (`~/Workspace/dev-digest/.claude/skills/`)
+### Skills (`~/Workspace/dev-digest/.claude/skills/`)
 
-| Скоуп | Скіли |
+| Scope | Skills |
 | --- | --- |
 | Backend | `onion-architecture`, `onion-architecture-workspace`, `fastify-best-practices`, `drizzle-orm-patterns`, `postgresql-table-design` |
 | Frontend | `next-best-practices`, `react-best-practices`, `react-component-architecture`, `react-testing-library` |
@@ -639,12 +641,12 @@ Read-only, автооновлення вимкнені, seed має пріори
 | Shared | `mermaid-diagram`, `dependency-checker` |
 | Workflow | `engineering-insights`, `pr-self-review`, `implement-plan`, `workflow-retro` |
 
-### ⚠️ Важливо: не всі скіли — наші
+### ⚠️ Important: not all skills are ours
 
-`dev-digest/skills-lock.json` показує, що частина скілів **вендорена з чужих GitHub-репо**
-(з `source`, `sourceType`, `skillPath`, `computedHash`):
+`dev-digest/skills-lock.json` shows that some skills are **vendored from other people's GitHub repos**
+(with `source`, `sourceType`, `skillPath`, `computedHash`):
 
-| Скіл | Джерело |
+| Skill | Source |
 | --- | --- |
 | `architecture-patterns` | `sickn33/antigravity-awesome-skills` |
 | `drizzle-orm-patterns` | `giuseppe-trisciuoglio/developer-kit` |
@@ -652,51 +654,50 @@ Read-only, автооновлення вимкнені, seed має пріори
 | `github-workflow-automation` | `ruvnet/ruflo` |
 | `next-best-practices` | `vercel-labs/next-skills` |
 | `postgresql-table-design` | `wshobson/agents` |
-| … | (повний список — у `skills-lock.json`) |
+| … | (full list — in `skills-lock.json`) |
 
-**Наслідок:** вендорені скіли **не варто** класти у власні плагіни й перевидавати під своїм ім'ям —
-це питання ліцензій і атрибуції. Правильний шлях — посилатися на них у каталозі як на зовнішні
-джерела (`github` / `git-subdir` із `ref`+`sha`), як це робить офіційний репо Anthropic.
-Власними є, схоже, ті, яких немає в lock-файлі (`onion-architecture`, `pr-self-review`,
-`implement-plan`, `workflow-retro`, `engineering-insights`, …) — **треба звірити поіменно**.
+**Consequence:** vendored skills **should not** be put into our own plugins and re-published under our
+name — that's a licensing and attribution issue. The right path is to reference them in the catalog as
+external sources (`github` / `git-subdir` with `ref`+`sha`), the way the official Anthropic repo does.
+The ones that appear to be ours are those absent from the lock file (`onion-architecture`, `pr-self-review`,
+`implement-plan`, `workflow-retro`, `engineering-insights`, …) — **needs a name-by-name check**.
 
-### Хуки
+### Hooks
 
 `.claude/hooks/engineering-insights-read.sh`, `.claude/hooks/engineering-insights-stop.sh` —
-пов'язані зі скілом `engineering-insights`; якщо переносити скіл, хуки їдуть із ним у той самий плагін.
+tied to the `engineering-insights` skill; if the skill is migrated, the hooks go with it into the same plugin.
 
-### Ідея групування (чернетка)
+### Grouping idea (draft)
 
-Не по одному плагіну на скіл, а тематичними бандлами:
+Not one plugin per skill, but thematic bundles:
 
-| Плагін | Вміст |
+| Plugin | Contents |
 | --- | --- |
-| `devdigest-sdd-workflow` | Агенти циклу Spec→Doc + скіли `implement-plan`, `pr-self-review`, `workflow-retro`, `engineering-insights` + хуки |
+| `devdigest-sdd-workflow` | Spec→Doc cycle agents + skills `implement-plan`, `pr-self-review`, `workflow-retro`, `engineering-insights` + hooks |
 | `devdigest-backend` | `onion-architecture`, `fastify-*`, `drizzle-*`, `postgresql-*` |
 | `devdigest-frontend` | `next-*`, `react-*` × 3 |
 | `devdigest-foundation` | `zod`, `typescript-expert`, `security`, `mermaid-diagram` |
 
-## 14. Рішення та відкриті питання
+## 14. Decisions and open questions
 
-### Зафіксовано
+### Decided
 
-| Питання | Рішення |
+| Question | Decision |
 | --- | --- |
-| Ім'я маркетплейсу | **`seasoned-ai-marketplace`** (репо лишається `RomanMinenok/ai-marketplace` — ім'я в маніфесті не мусить збігатися з іменем репо) |
-| Де живуть плагіни | **Моно-репо**: `plugins/<name>/`, відносні шляхи `"./plugins/x"`. Легко розділити пізніше |
-| Версіонування | **Явний SemVer у `plugin.json`** + bump-check у CI. Не задавати `version` у записі каталогу — `plugin.json` виграє мовчки |
-| Власний лінтер | **Потрібен.** Офіційний валідатор не ловить зарезервовані назви, kebab-case і неіснуючі теки (див. §10). `scripts/validate-marketplace.mjs` |
-| Secrets scan | **Жорсткий fail**, без allowlist |
-| Третьосторонні скіли | Не перевидавати як свої — посилатися зовнішнім джерелом із `ref` + повним `sha` |
+| Marketplace name | **`seasoned-ai-marketplace`** (the repo stays `RomanMinenok/ai-marketplace` — the name in the manifest doesn't need to match the repo name) |
+| Where plugins live | **Mono-repo**: `plugins/<name>/`, relative paths `"./plugins/x"`. Easy to split later |
+| Versioning | **Explicit SemVer in `plugin.json`** + a bump-check in CI. Don't set `version` in the catalog entry — `plugin.json` silently wins |
+| Custom linter | **Needed.** The official validator doesn't catch reserved names, kebab-case, or nonexistent folders (see §10). `scripts/validate-marketplace.mjs` |
+| Secrets scan | **Hard fail**, no allowlist |
+| Third-party skills | Don't re-publish as our own — reference via an external source with `ref` + full `sha` |
 
-### Лишилось відкритим
+### Still open
 
-1. **`owner`**: зараз `{"name": "Roman Minenok", "email": "roman.minenok@gmail.com"}` — замінити на
-   командний, якщо потрібно.
-2. **LICENSE**: не створено свідомо. Для приватного/командного репо MIT недоречний, а вигадувати
-   пропрієтарні формулювання — не моя справа. Треба рішення.
-3. **Які саме скіли/агенти** переносити з `dev-digest` — і які з них наші, а які вендорені (§13).
-   Потрібна поіменна звірка зі `skills-lock.json`.
-4. **Групування плагінів**: бандли (`seasoned-sdd-workflow`, `seasoned-backend`, …) чи по одному
-   плагіну на скіл? Чернетка в §13, рішення — після перших 2–3 плагінів
-   («explore first, standardise later»).
+1. **`owner`**: currently `{"name": "Roman Minenok", "email": "roman.minenok@gmail.com"}` — replace with
+   a team one if needed.
+2. **LICENSE**: deliberately not created. For a private/team repo, MIT doesn't fit, and inventing
+   proprietary wording isn't my call. Needs a decision.
+3. **Which skills/agents exactly** to migrate from `dev-digest` — and which of them are ours vs. vendored
+   (§13). Needs a name-by-name check against `skills-lock.json`.
+4. **Plugin grouping**: bundles (`seasoned-sdd-workflow`, `seasoned-backend`, …) or one plugin per skill?
+   Draft in §13, decision after the first 2–3 plugins ("explore first, standardise later").

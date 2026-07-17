@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import type { Kind, SearchEntry } from '../types'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 const FUSE_OPTIONS: ConstructorParameters<typeof Fuse<SearchEntry>>[1] = {
   includeScore: true,

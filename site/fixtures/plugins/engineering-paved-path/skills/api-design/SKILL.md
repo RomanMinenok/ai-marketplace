@@ -1,6 +1,6 @@
 ---
-description: Правила проєктування REST/RPC API та їх версіонування.
+description: Rules for designing REST/RPC APIs and their versioning.
 tools: []
 ---
 
-Конвенції нейменгу ресурсів, коди помилок, пагінація, зворотна сумісність і депрекації.
+Resource naming conventions, error codes, pagination, backward compatibility, and deprecations.

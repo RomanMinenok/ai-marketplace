@@ -1,7 +1,7 @@
 ---
-description: Статичний аналіз коду на відомі патерни вразливостей.
+description: Static analysis of code for known vulnerability patterns.
 tools: [Read, Grep, Glob]
 model: claude-sonnet
 ---
 
-Сканує кодову базу за набором SAST-правил і формує звіт із severity та рекомендаціями.
+Scans the codebase against a set of SAST rules and produces a report with severity and recommendations.

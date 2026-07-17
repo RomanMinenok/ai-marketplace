@@ -3,7 +3,7 @@ import Fuse from 'fuse.js'
 import type { ChangelogEntry, PluginDetailData, SearchEntry, SiteMeta } from '../types'
 import { loadSiteData } from './data'
 import { buildIndex } from './search'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 interface SiteDataValue {
   loading: boolean

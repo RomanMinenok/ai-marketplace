@@ -1,5 +1,5 @@
 # Commit Helper
 
-Commit Helper дивиться на застейджені зміни й пропонує повідомлення у форматі Conventional Commits.
+Commit Helper looks at staged changes and proposes a message in Conventional Commits format.
 
-Pre-commit hook блокує коміти, що не відповідають конвенції, і підказує виправлення.
+A pre-commit hook blocks commits that don't follow the convention and suggests fixes.

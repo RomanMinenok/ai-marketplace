@@ -1,9 +1,9 @@
 ---
-description: Агент, що будує карту компонентів і залежностей у проєкті.
+description: Agent that builds a map of components and dependencies in the project.
 tools: [Read, Grep, Glob]
 model: claude-sonnet
 ---
 
-react-analyzer сканує директорію src, будує граф імпортів компонентів і визначає гарячі точки ре-рендерів.
+react-analyzer scans the src directory, builds a component import graph, and identifies re-render hotspots.
 
-Використовується як контекст для інших скілів або самостійно для code review.
+Used as context for other skills or on its own for code review.

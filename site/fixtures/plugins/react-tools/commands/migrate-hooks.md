@@ -1,6 +1,6 @@
 ---
-description: Автоматична міграція class-компонентів на функціональні з хуками.
+description: Automatic migration of class components to functional components with hooks.
 tools: [Read, Edit]
 ---
 
-Команда конвертує lifecycle-методи в useEffect/useMemo, зберігаючи семантику, і позначає місця, які потребують ручної перевірки.
+The command converts lifecycle methods to useEffect/useMemo, preserving semantics, and flags spots that need manual review.

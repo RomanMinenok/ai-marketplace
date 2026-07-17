@@ -2,7 +2,7 @@
   "name": "commit-helper",
   "displayName": "Commit Helper",
   "version": "1.2.0",
-  "description": "Генерує conventional commits за diff і тримає повідомлення охайними через pre-commit hook.",
+  "description": "Generates conventional commits from a diff and keeps messages clean via a pre-commit hook.",
   "author": { "name": "DevEx" },
   "license": "MIT",
   "keywords": ["git", "commits", "conventional"],

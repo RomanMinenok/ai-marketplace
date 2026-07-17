@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSiteData } from '../lib/SiteDataContext'
 import { getStoredTheme, storeTheme, type Theme } from '../lib/theme'
 import CommandPalette from './CommandPalette'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function Layout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()

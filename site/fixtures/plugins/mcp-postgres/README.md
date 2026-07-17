@@ -1,5 +1,5 @@
 # Postgres MCP
 
-Postgres MCP надає Claude Code контрольований доступ до бази даних через Model Context Protocol.
+Postgres MCP gives Claude Code controlled database access via the Model Context Protocol.
 
-За замовчуванням сервер працює в read-only режимі й вимагає явного allow-list таблиць. Жодних DDL/DML без окремого дозволу.
+By default the server runs in read-only mode and requires an explicit table allow-list. No DDL/DML without separate permission.
