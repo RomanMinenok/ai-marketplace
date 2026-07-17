@@ -1,0 +1,54 @@
+name: Validate marketplace
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate marketplace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The version-bump check diffs against the PR base, so we need history.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Blocking: covers what the official validator does not (reserved names,
+      # kebab-case, missing source dirs, CODEOWNERS, secrets, version bumps).
+      # Verified against Claude Code v2.1.212 — see scripts/validate-marketplace.mjs.
+      - name: Structural lint
+        run: node scripts/validate-marketplace.mjs
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      # `claude plugin validate` needs no ANTHROPIC_API_KEY — verified headless
+      # with no auth and no HOME.
+      #
+      # Not --strict: an empty `plugins: []` is a warning, and --strict turns it
+      # into a failure (exit 1). Switch to --strict once the catalog has its
+      # first plugin entry.
+      - name: Validate marketplace catalog
+        run: claude plugin validate .
+
+      - name: Validate each plugin
+        run: |
+          shopt -s nullglob
+          found=0
+          for dir in plugins/*/; do
+            found=1
+            echo "::group::$dir"
+            claude plugin validate "$dir" --strict
+            echo "::endgroup::"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No plugins yet — nothing to validate."
+          fi

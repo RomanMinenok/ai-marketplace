@@ -1,0 +1,11 @@
+# Catch-all: every change needs a review from the marketplace maintainers.
+*                           @RomanMinenok
+
+# The catalog itself is the highest-risk file — it decides what code lands in
+# every developer's session. Keep it owned even if per-plugin ownership below
+# gets delegated.
+/.claude-plugin/            @RomanMinenok
+/.github/                   @RomanMinenok
+
+# Per-plugin ownership goes here as plugins land, e.g.
+# /plugins/seasoned-backend/   @some-team
