@@ -1,0 +1,10 @@
+{
+  "name": "security-scan",
+  "displayName": "Security Scan",
+  "version": "0.5.0",
+  "description": "SAST-агент і hooks, що ловлять вразливості та секрети до того, як вони потраплять у репозиторій.",
+  "author": { "name": "Security" },
+  "license": "MIT",
+  "keywords": ["security", "audit", "sast", "secrets"],
+  "compatibility": "beta"
+}

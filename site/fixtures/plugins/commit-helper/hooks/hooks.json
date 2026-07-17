@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "name": "pre-commit-lint",
+        "description": "Hook, що валідує повідомлення коміту перед записом.",
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/lint-commit-msg.sh" }
+        ]
+      }
+    ]
+  }
+}

@@ -38,9 +38,13 @@ when you need non-default paths.
   "version": "1.0.0",
   "description": "One sentence on what this plugin does",
   "author": { "name": "Roman Minenok" },
-  "keywords": ["backend", "architecture"]
+  "keywords": ["backend", "architecture"],
+  "compatibility": "Claude Code ≥ 1.4"
 }
 ```
+
+`compatibility` is optional free text (e.g. `"Claude Code ≥ 1.4"`, `"MCP 0.4+"`, `"beta"`) shown as a
+badge on the marketplace site's plugin page. Not validated or enforced — just a hint to readers.
 
 ### Naming
 
@@ -94,15 +98,17 @@ whatever comes next. Put Claude-Code-specific wiring (hooks, MCP servers, custom
 ## CHANGELOG
 
 Each plugin keeps a `plugins/<name>/CHANGELOG.md`. One entry per released version, newest first,
-saying what changed for the *user* of the plugin — not what files moved.
+saying what changed for the *user* of the plugin — not what files moved. Each version heading
+carries a release date (`YYYY-MM-DD`) so the marketplace site's "what's new" feed can sort and
+display it.
 
 ```markdown
 # Changelog
 
-## 1.1.0
+## 1.1.0 — 2026-07-08
 - Added a check for X
 
-## 1.0.0
+## 1.0.0 — 2026-06-01
 - Initial release
 ```
 

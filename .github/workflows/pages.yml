@@ -1,0 +1,77 @@
+name: Deploy marketplace site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'plugins/**'
+      - '.claude-plugin/marketplace.json'
+      - 'scripts/build-site-data.mjs'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # Separate from validate.yml on purpose: this is a cheap safety net in
+  # case someone pushes straight to main, bypassing branch protection — the
+  # real PR gate for marketplace structure lives in validate.yml. Kept as
+  # its own job (not a step inside "Build site") so a marketplace-structure
+  # failure and a site-build failure show up as two distinct, independently
+  # red/green checks in the GitHub UI, instead of one conflated status.
+  guard:
+    name: Marketplace structure guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/validate-marketplace.mjs
+
+  build:
+    name: Build site
+    needs: guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
+      # `npm run build` regenerates site/public/data from the real catalog
+      # (scripts/build-site-data.mjs --source ..) before the Vite build, so
+      # there is only one place — package.json — that defines the pipeline.
+      - name: Build site
+        working-directory: site
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    name: Deploy site
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

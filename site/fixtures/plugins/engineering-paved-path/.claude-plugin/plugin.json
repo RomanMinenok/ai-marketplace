@@ -1,0 +1,10 @@
+{
+  "name": "engineering-paved-path",
+  "displayName": "Engineering Paved Path",
+  "version": "1.8.2",
+  "description": "Канонічні стандарти команди: правила React, тестування й дизайну API, які підтягуються як контекст іншими плагінами.",
+  "author": { "name": "Platform Team" },
+  "license": "MIT",
+  "keywords": ["standards", "best-practices", "guidelines", "architecture"],
+  "compatibility": "Claude Code ≥ 1.2"
+}

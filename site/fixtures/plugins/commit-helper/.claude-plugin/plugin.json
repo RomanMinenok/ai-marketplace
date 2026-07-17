@@ -1,0 +1,10 @@
+{
+  "name": "commit-helper",
+  "displayName": "Commit Helper",
+  "version": "1.2.0",
+  "description": "Генерує conventional commits за diff і тримає повідомлення охайними через pre-commit hook.",
+  "author": { "name": "DevEx" },
+  "license": "MIT",
+  "keywords": ["git", "commits", "conventional"],
+  "compatibility": "Claude Code ≥ 1.3"
+}

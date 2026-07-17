@@ -1,0 +1,11 @@
+{
+  "name": "react-tools",
+  "displayName": "React Tools",
+  "version": "2.3.0",
+  "description": "Набір скілів і агент для рефакторингу React-кодових баз: розбір компонентів, міграція на hooks, автоформат при збереженні.",
+  "author": { "name": "Kyiv Frontend Guild" },
+  "license": "MIT",
+  "keywords": ["react", "frontend", "refactoring", "hooks"],
+  "compatibility": "Claude Code ≥ 1.4",
+  "dependencies": ["engineering-paved-path:react-best-practices"]
+}
