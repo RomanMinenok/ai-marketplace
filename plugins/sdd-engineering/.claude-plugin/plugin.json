@@ -1,0 +1,13 @@
+{
+  "name": "sdd-engineering",
+  "displayName": "SDD Engineering",
+  "version": "1.0.0",
+  "description": "Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, plan-verifier — plus a run-plan skill to orchestrate the Implement/Verify/Review loop and a retro workflow to analyze a finished pipeline run.",
+  "author": { "name": "Roman Minenok", "email": "roman.minenok@gmail.com" },
+  "keywords": ["sdd", "spec-driven-development", "agents", "workflow"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" },
+    { "name": "research-tools", "version": "^1.0.0" },
+    { "name": "architecture-review", "version": "^1.0.0" }
+  ]
+}
