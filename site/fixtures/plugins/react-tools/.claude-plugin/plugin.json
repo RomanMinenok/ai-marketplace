@@ -2,7 +2,7 @@
   "name": "react-tools",
   "displayName": "React Tools",
   "version": "2.3.0",
-  "description": "Набір скілів і агент для рефакторингу React-кодових баз: розбір компонентів, міграція на hooks, автоформат при збереженні.",
+  "description": "A set of skills and an agent for refactoring React codebases: component decomposition, migration to hooks, format-on-save.",
   "author": { "name": "Kyiv Frontend Guild" },
   "license": "MIT",
   "keywords": ["react", "frontend", "refactoring", "hooks"],

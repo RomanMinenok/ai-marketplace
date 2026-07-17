@@ -1,5 +1,5 @@
 # Security Scan
 
-Security Scan — набір інструментів безпеки: статичний аналіз коду й запобіжники на рівні git-хуків.
+Security Scan — a set of security tools: static code analysis and safeguards at the git-hooks level.
 
-Плагін у статусі beta: правила ще калібруються, можливі хибні спрацювання.
+The plugin is in beta status: rules are still being calibrated, false positives are possible.

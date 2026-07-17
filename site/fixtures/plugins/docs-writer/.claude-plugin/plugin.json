@@ -2,7 +2,7 @@
   "name": "docs-writer",
   "displayName": "Docs Writer",
   "version": "3.0.0",
-  "description": "Пише й ревʼює документацію: API-довідники з коду, changelog-и та перевірка стилю markdown.",
+  "description": "Writes and reviews documentation: API references generated from code, changelogs, and markdown style checks.",
   "author": { "name": "Docs Guild" },
   "license": "MIT",
   "keywords": ["documentation", "markdown", "writing"],

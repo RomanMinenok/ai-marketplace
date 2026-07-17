@@ -1,4 +1,4 @@
 # Changelog
 
 ## 3.0.0 — 2026-07-05
-- Повне переписування генератора API-доків під TSDoc.
+- Full rewrite of the API docs generator for TSDoc.

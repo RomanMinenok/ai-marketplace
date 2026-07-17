@@ -1,9 +1,9 @@
 ---
-description: Аудит компонента на антипатерни й проблеми продуктивності.
+description: Audits a component for anti-patterns and performance issues.
 tools: [Read, Grep]
 invocation: /audit
 ---
 
-Перевіряє компонент за чеклистом best-practices: правила хуків, меморизація, доступність.
+Checks the component against a best-practices checklist: rules of hooks, memoization, accessibility.
 
-Результат — звіт із пріоритезованими зауваженнями та посиланнями на релевантні правила з paved-path.
+The result is a report with prioritized findings and links to the relevant paved-path rules.

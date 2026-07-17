@@ -1,6 +1,6 @@
 ---
-description: Стандарти юніт- та інтеграційного тестування команди.
+description: The team's unit and integration testing standards.
 tools: []
 ---
 
-Описує піраміду тестів, іменування, роботу з моками та цільове покриття для критичних шляхів.
+Describes the test pyramid, naming, working with mocks, and target coverage for critical paths.

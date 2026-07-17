@@ -2,7 +2,7 @@
   "name": "mcp-postgres",
   "displayName": "Postgres MCP",
   "version": "0.9.1",
-  "description": "MCP-сервер для безпечного read-only доступу до Postgres: інспекція схеми, пояснення запитів, вибірки під наглядом.",
+  "description": "MCP server for safe read-only access to Postgres: schema inspection, query explanation, supervised queries.",
   "author": { "name": "Data Platform" },
   "license": "MIT",
   "keywords": ["database", "sql", "mcp", "postgres"],

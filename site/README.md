@@ -28,7 +28,7 @@ Things to click through once it's running:
 - Home: hero search, keyword chips, stat tiles, "what's new" preview, browse-by-kind tiles
 - `⌘K` / `Ctrl+K` — command palette, jump to any artifact
 - Search (`/search`): facets (kind/keyword/author), sort, no-results state
-- A plugin card → plugin detail page → an artifact card inside "Склад плагіна" → artifact detail page → breadcrumb back
+- A plugin card → plugin detail page → an artifact card inside "Plugin composition" → artifact detail page → breadcrumb back
 - "Copy install" on a card, on the plugin page, and on an artifact page — check the clipboard + toast + button checkmark
 - `/whats-new` and `/getting-started`
 - Theme toggle (☾/☀) in the header

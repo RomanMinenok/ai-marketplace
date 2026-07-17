@@ -1,9 +1,9 @@
 ---
-description: Покроковий рефакторинг обраного React-компонента з попереднім переглядом змін.
+description: Step-by-step refactoring of the selected React component with a change preview.
 tools: [Read, Edit, Grep]
 invocation: /refactor
 ---
 
-Скіл приймає шлях до компонента або відкритий файл. Спершу будується AST і виявляються межі логічних блоків.
+The skill accepts a path to a component or the currently open file. It first builds an AST and identifies the boundaries of logical blocks.
 
-Далі пропонується план: винесення підкомпонентів, підняття стану, заміна класів на функції з хуками. Кожен крок показується як diff перед застосуванням.
+Then it proposes a plan: extracting subcomponents, lifting state, replacing classes with functions and hooks. Each step is shown as a diff before being applied.

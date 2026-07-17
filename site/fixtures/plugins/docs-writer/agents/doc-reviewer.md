@@ -1,7 +1,7 @@
 ---
-description: Агент, що ревʼює документацію на стиль і биті посилання.
+description: Agent that reviews documentation for style and broken links.
 tools: [Read, Grep]
 model: claude-sonnet
 ---
 
-Перевіряє тон, узгодженість термінології, наявність битих внутрішніх посилань і застарілих прикладів.
+Checks tone, terminology consistency, broken internal links, and outdated examples.

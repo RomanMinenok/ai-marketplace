@@ -3,7 +3,7 @@
     "PostToolUse": [
       {
         "name": "on-save-format",
-        "description": "Hook, що запускає форматер після кожного збереження файлу.",
+        "description": "Hook that runs the formatter after every file save.",
         "matcher": "Write|Edit",
         "hooks": [
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/format.sh" }

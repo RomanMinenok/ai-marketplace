@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useSiteData } from '../lib/SiteDataContext'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function WhatsNew() {
   const navigate = useNavigate()

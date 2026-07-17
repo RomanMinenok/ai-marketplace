@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2.3.0 — 2026-07-08
-- Додано скіл component-audit і підтримку React 19 Server Components.
+- Added the component-audit skill and React 19 Server Components support.
 
 ## 2.2.1 — 2026-06-20
-- Виправлено хибні спрацювання hook-лінтера на useEffect.
+- Fixed false positives in the hook linter on useEffect.

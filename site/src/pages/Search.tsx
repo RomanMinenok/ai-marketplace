@@ -5,7 +5,7 @@ import { ALL_KINDS, countBy, filterAndSort, KIND_LABELS, type SortMode } from '.
 import type { Kind } from '../types'
 import Card from '../components/Card'
 import { KindDot } from '../components/KindBadge'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function Search() {
   const { entries, index } = useSiteData()

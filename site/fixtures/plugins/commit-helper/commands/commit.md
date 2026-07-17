@@ -1,6 +1,6 @@
 ---
-description: Створює commit-повідомлення за застейдженим diff.
+description: Creates a commit message from the staged diff.
 tools: [Bash, Read]
 ---
 
-Команда читає `git diff --staged`, класифікує зміни й формує заголовок + тіло в стилі Conventional Commits.
+The command reads `git diff --staged`, classifies the changes, and builds a title + body in Conventional Commits style.

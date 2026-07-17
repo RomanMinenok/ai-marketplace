@@ -3,7 +3,7 @@ import type { SearchEntry } from '../types'
 import KindBadge from './KindBadge'
 import CopyInstallButton from './CopyInstallButton'
 import { useSiteData, installText } from '../lib/SiteDataContext'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function Card({ entry }: { entry: SearchEntry }) {
   const navigate = useNavigate()

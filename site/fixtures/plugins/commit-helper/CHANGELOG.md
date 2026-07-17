@@ -1,4 +1,4 @@
 # Changelog
 
 ## 1.2.0 — 2026-06-15
-- Підтримка scoped-комітів і кастомних типів.
+- Support for scoped commits and custom types.

@@ -1,7 +1,7 @@
 ---
-description: Збирає changelog з історії комітів між тегами.
+description: Assembles a changelog from commit history between tags.
 tools: [Bash, Write]
 invocation: /changelog
 ---
 
-Групує коміти за типом (feat/fix/…) і формує розділ релізу у форматі Keep a Changelog.
+Groups commits by type (feat/fix/…) and produces a release section in Keep a Changelog format.

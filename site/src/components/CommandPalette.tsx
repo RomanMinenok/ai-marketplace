@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSiteData } from '../lib/SiteDataContext'
 import { KindDot } from './KindBadge'
-import { t } from '../i18n/uk'
+import { t } from '../i18n/en'
 
 export default function CommandPalette() {
   const { paletteOpen, setPaletteOpen, entries, index } = useSiteData()

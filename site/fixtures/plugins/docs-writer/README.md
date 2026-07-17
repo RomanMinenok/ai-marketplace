@@ -1,5 +1,5 @@
 # Docs Writer
 
-Docs Writer автоматизує рутину документації: генерацію довідників з сигнатур, збірку changelog і вичитку тексту.
+Docs Writer automates documentation chores: generating references from signatures, assembling changelogs, and proofreading text.
 
-Агент doc-reviewer перевіряє тон, узгодженість термінів і биті посилання.
+The doc-reviewer agent checks tone, terminology consistency, and broken links.
