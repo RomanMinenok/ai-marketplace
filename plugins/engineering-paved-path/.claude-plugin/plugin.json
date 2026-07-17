@@ -1,0 +1,15 @@
+{
+  "name": "engineering-paved-path",
+  "displayName": "Engineering Paved Path",
+  "version": "1.0.0",
+  "description": "Shared engineering-practice skills — React, component architecture, layered/hexagonal backend architecture, testing, security, diagramming — plus Fastify/Next.js/TypeScript/Postgres/Drizzle skills pulled in as third-party dependencies.",
+  "author": { "name": "Roman Minenok", "email": "roman.minenok@gmail.com" },
+  "keywords": ["skills", "react", "architecture", "security", "testing"],
+  "dependencies": [
+    "fastify-best-practices",
+    "next-best-practices",
+    "typescript-expert",
+    "postgresql-table-design",
+    "drizzle-orm-patterns"
+  ]
+}
