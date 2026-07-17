@@ -1,0 +1,10 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "seasoned-ai-marketplace",
+  "description": "Internal catalog of seasoned AI skills, agents and plugins for Claude Code",
+  "owner": {
+    "name": "Roman Minenok",
+    "email": "roman.minenok@gmail.com"
+  },
+  "plugins": []
+}
