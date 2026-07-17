@@ -1,0 +1,10 @@
+{
+  "name": "docs-writer",
+  "displayName": "Docs Writer",
+  "version": "3.0.0",
+  "description": "Пише й ревʼює документацію: API-довідники з коду, changelog-и та перевірка стилю markdown.",
+  "author": { "name": "Docs Guild" },
+  "license": "MIT",
+  "keywords": ["documentation", "markdown", "writing"],
+  "compatibility": "Claude Code ≥ 1.4"
+}

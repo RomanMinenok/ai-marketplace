@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "name": "pre-push-scan",
+        "description": "Hook, що запускає швидкий скан перед push.",
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-push-scan.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "name": "secret-guard",
+        "description": "Hook, що не дає закомітити ключі й токени.",
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/secret-guard.sh" }
+        ]
+      }
+    ]
+  }
+}
