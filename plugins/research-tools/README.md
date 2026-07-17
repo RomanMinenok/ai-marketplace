@@ -20,6 +20,10 @@ Delegate to `researcher` (via the `Agent`/`Task` tool, `subagent_type:
 - Gather external facts — library/API/tooling documentation, version
   behaviour, industry conventions
 
+Example: "researcher, find where the retry logic for the payments client
+lives" returns a project report; "researcher, what's the current rate
+limit for the Stripe API" returns a web report.
+
 It operates in one of two modes, and asks first if it's unclear which:
 
 - **Project research** — `Grep`/`Glob`/`Read` over the codebase, every
